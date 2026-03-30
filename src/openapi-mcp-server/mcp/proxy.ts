@@ -83,6 +83,54 @@ function deserializeParams(params: Record<string, unknown>): Record<string, unkn
   return result
 }
 
+/**
+ * For the query-data-source operation, resolve a database_id to a data_source_id
+ * by searching via the Notion API. Notion's data source endpoints require a
+ * data_source_id, but users typically have a database_id from URLs.
+ */
+async function resolveDatabaseIdToDataSourceId(
+  httpClient: HttpClient,
+  openApiLookup: Record<string, OpenAPIV3.OperationObject & { method: string; path: string }>,
+  databaseId: string,
+): Promise<string> {
+  const searchOp = openApiLookup['post-search']
+  if (!searchOp) {
+    throw new Error('Cannot resolve database_id: post-search operation not found in spec')
+  }
+
+  const response = await httpClient.executeOperation(searchOp, {
+    filter: { value: 'database', property: 'object' },
+  })
+
+  const results = response.data?.results ?? []
+  for (const result of results) {
+    if (result.id === databaseId || result.id === databaseId.replace(/-/g, '')) {
+      // The data_source_id is available in the data_source field
+      if (result.data_source?.id) {
+        return result.data_source.id
+      }
+    }
+  }
+
+  // If not found via search, try using the retrieve-a-database endpoint
+  const retrieveOp = openApiLookup['retrieve-a-database']
+  if (retrieveOp) {
+    try {
+      const dbResponse = await httpClient.executeOperation(retrieveOp, {
+        database_id: databaseId,
+      })
+      if (dbResponse.data?.data_source?.id) {
+        return dbResponse.data.data_source.id
+      }
+    } catch {
+      // Fall through — the ID might already be a data_source_id
+    }
+  }
+
+  // Return original ID as-is — it may already be a data_source_id
+  return databaseId
+}
+
 // import this class, extend and return server
 export class MCPProxy {
   private server: Server
@@ -159,6 +207,22 @@ export class MCPProxy {
       // Deserialize any stringified JSON parameters (fixes double-serialization bug)
       // See: https://github.com/makenotion/notion-mcp-server/issues/176
       const deserializedParams = params ? deserializeParams(params as Record<string, unknown>) : {}
+
+      // For query-data-source, resolve database_id to data_source_id if needed
+      if (operation.operationId === 'query-data-source' && deserializedParams.data_source_id) {
+        try {
+          deserializedParams.data_source_id = await resolveDatabaseIdToDataSourceId(
+            this.httpClient,
+            this.openApiLookup,
+            deserializedParams.data_source_id as string,
+          )
+        } catch (error) {
+          // If resolution fails, proceed with the original ID
+          if (process.env.NODE_ENV !== 'test') {
+            console.warn('Failed to resolve database_id to data_source_id, using original value:', error)
+          }
+        }
+      }
 
       try {
         // Execute the operation

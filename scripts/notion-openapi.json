@@ -75,6 +75,43 @@
               "text"
             ],
             "type": "string"
+          },
+          "annotations": {
+            "type": "object",
+            "description": "Styling information for the rich text. All fields are optional and default to false or 'default' for color.",
+            "properties": {
+              "bold": {
+                "type": "boolean"
+              },
+              "italic": {
+                "type": "boolean"
+              },
+              "strikethrough": {
+                "type": "boolean"
+              },
+              "underline": {
+                "type": "boolean"
+              },
+              "code": {
+                "type": "boolean"
+              },
+              "color": {
+                "type": "string",
+                "enum": [
+                  "default",
+                  "blue", "blue_background",
+                  "brown", "brown_background",
+                  "gray", "gray_background",
+                  "green", "green_background",
+                  "orange", "orange_background",
+                  "pink", "pink_background",
+                  "purple", "purple_background",
+                  "red", "red_background",
+                  "yellow", "yellow_background"
+                ]
+              }
+            },
+            "additionalProperties": false
           }
         },
         "additionalProperties": false
@@ -250,6 +287,428 @@
         },
         "additionalProperties": false
       },
+      "heading1BlockRequest": {
+        "type": "object",
+        "properties": {
+          "heading_1": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "color": {
+                "type": "string",
+                "description": "The color of the heading.",
+                "default": "default"
+              },
+              "is_toggleable": {
+                "type": "boolean",
+                "description": "Whether the heading is toggleable.",
+                "default": false
+              }
+            },
+            "required": ["rich_text"]
+          },
+          "type": {
+            "enum": ["heading_1"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "heading2BlockRequest": {
+        "type": "object",
+        "properties": {
+          "heading_2": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "color": {
+                "type": "string",
+                "description": "The color of the heading.",
+                "default": "default"
+              },
+              "is_toggleable": {
+                "type": "boolean",
+                "description": "Whether the heading is toggleable.",
+                "default": false
+              }
+            },
+            "required": ["rich_text"]
+          },
+          "type": {
+            "enum": ["heading_2"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "heading3BlockRequest": {
+        "type": "object",
+        "properties": {
+          "heading_3": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "color": {
+                "type": "string",
+                "description": "The color of the heading.",
+                "default": "default"
+              },
+              "is_toggleable": {
+                "type": "boolean",
+                "description": "Whether the heading is toggleable.",
+                "default": false
+              }
+            },
+            "required": ["rich_text"]
+          },
+          "type": {
+            "enum": ["heading_3"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "dividerBlockRequest": {
+        "type": "object",
+        "properties": {
+          "divider": {
+            "type": "object",
+            "additionalProperties": false
+          },
+          "type": {
+            "enum": ["divider"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "calloutBlockRequest": {
+        "type": "object",
+        "properties": {
+          "callout": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "icon": {
+                "type": "object",
+                "description": "An emoji or external file icon.",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["emoji", "external"]
+                  },
+                  "emoji": {
+                    "type": "string",
+                    "description": "The emoji character (when type is 'emoji')."
+                  },
+                  "external": {
+                    "type": "object",
+                    "description": "External file URL (when type is 'external').",
+                    "properties": {
+                      "url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["url"]
+                  }
+                }
+              },
+              "color": {
+                "type": "string",
+                "description": "The color of the callout background.",
+                "default": "default"
+              },
+              "children": {
+                "type": "array",
+                "description": "Nested child blocks within the callout.",
+                "items": {
+                  "$ref": "#/components/schemas/blockObjectRequest"
+                }
+              }
+            },
+            "required": ["rich_text"]
+          },
+          "type": {
+            "enum": ["callout"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "toggleBlockRequest": {
+        "type": "object",
+        "properties": {
+          "toggle": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "color": {
+                "type": "string",
+                "default": "default"
+              },
+              "children": {
+                "type": "array",
+                "description": "Nested child blocks within the toggle.",
+                "items": {
+                  "$ref": "#/components/schemas/blockObjectRequest"
+                }
+              }
+            },
+            "required": ["rich_text"]
+          },
+          "type": {
+            "enum": ["toggle"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "numberedListItemBlockRequest": {
+        "type": "object",
+        "properties": {
+          "numbered_list_item": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "color": {
+                "type": "string",
+                "default": "default"
+              },
+              "children": {
+                "type": "array",
+                "description": "Nested child blocks.",
+                "items": {
+                  "$ref": "#/components/schemas/blockObjectRequest"
+                }
+              }
+            },
+            "required": ["rich_text"]
+          },
+          "type": {
+            "enum": ["numbered_list_item"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "toDoBlockRequest": {
+        "type": "object",
+        "properties": {
+          "to_do": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "checked": {
+                "type": "boolean",
+                "default": false
+              },
+              "color": {
+                "type": "string",
+                "default": "default"
+              },
+              "children": {
+                "type": "array",
+                "description": "Nested child blocks.",
+                "items": {
+                  "$ref": "#/components/schemas/blockObjectRequest"
+                }
+              }
+            },
+            "required": ["rich_text"]
+          },
+          "type": {
+            "enum": ["to_do"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "quoteBlockRequest": {
+        "type": "object",
+        "properties": {
+          "quote": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "color": {
+                "type": "string",
+                "default": "default"
+              },
+              "children": {
+                "type": "array",
+                "description": "Nested child blocks within the quote.",
+                "items": {
+                  "$ref": "#/components/schemas/blockObjectRequest"
+                }
+              }
+            },
+            "required": ["rich_text"]
+          },
+          "type": {
+            "enum": ["quote"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "tableBlockRequest": {
+        "type": "object",
+        "properties": {
+          "table": {
+            "type": "object",
+            "properties": {
+              "table_width": {
+                "type": "integer",
+                "description": "The number of columns in the table. This value cannot be changed after creation."
+              },
+              "has_column_header": {
+                "type": "boolean",
+                "description": "Whether the first row is a header row.",
+                "default": false
+              },
+              "has_row_header": {
+                "type": "boolean",
+                "description": "Whether the first column is a header column.",
+                "default": false
+              },
+              "children": {
+                "type": "array",
+                "description": "The table rows. Each child must be a table_row block.",
+                "items": {
+                  "$ref": "#/components/schemas/tableRowBlockRequest"
+                }
+              }
+            },
+            "required": ["table_width", "children"]
+          },
+          "type": {
+            "enum": ["table"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "tableRowBlockRequest": {
+        "type": "object",
+        "properties": {
+          "table_row": {
+            "type": "object",
+            "properties": {
+              "cells": {
+                "type": "array",
+                "description": "An array of cell contents. Each cell is an array of rich text objects.",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/richTextRequest"
+                  }
+                }
+              }
+            },
+            "required": ["cells"]
+          },
+          "type": {
+            "enum": ["table_row"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "codeBlockRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "object",
+            "properties": {
+              "rich_text": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                },
+                "maxItems": 100
+              },
+              "language": {
+                "type": "string",
+                "description": "The language of the code block.",
+                "enum": [
+                  "abap", "arduino", "bash", "basic", "c", "clojure", "coffeescript",
+                  "c++", "c#", "css", "dart", "diff", "docker", "elixir", "elm",
+                  "erlang", "flow", "fortran", "f#", "gherkin", "glsl", "go", "graphql",
+                  "groovy", "haskell", "html", "java", "javascript", "json", "julia",
+                  "kotlin", "latex", "less", "lisp", "livescript", "lua", "makefile",
+                  "markdown", "markup", "matlab", "mermaid", "nix", "objective-c", "ocaml",
+                  "pascal", "perl", "php", "plain text", "powershell", "prolog", "protobuf",
+                  "python", "r", "reason", "ruby", "rust", "sass", "scala", "scheme",
+                  "scss", "shell", "sql", "swift", "typescript", "vb.net", "verilog",
+                  "vhdl", "visual basic", "webassembly", "xml", "yaml",
+                  "java/c/c++/c#", "toml"
+                ]
+              },
+              "caption": {
+                "type": "array",
+                "description": "Caption for the code block.",
+                "items": {
+                  "$ref": "#/components/schemas/richTextRequest"
+                }
+              }
+            },
+            "required": ["rich_text", "language"]
+          },
+          "type": {
+            "enum": ["code"],
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "blockObjectRequest": {
         "anyOf": [
           {
@@ -257,6 +716,42 @@
           },
           {
             "$ref": "#/components/schemas/bulletedListItemBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/heading1BlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/heading2BlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/heading3BlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/dividerBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/calloutBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/toggleBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/numberedListItemBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/toDoBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/quoteBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/tableBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/tableRowBlockRequest"
+          },
+          {
+            "$ref": "#/components/schemas/codeBlockRequest"
           }
         ]
       }
@@ -901,11 +1396,192 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "description": "Provide the block type key (e.g. paragraph, heading_1) at the top level with its content. Do not include a 'type' field. See https://developers.notion.com/reference/update-a-block",
                 "properties": {
-                  "type": {
+                  "paragraph": {
                     "type": "object",
-                    "description": "The [block object `type`](ref:block#block-object-keys) value with the properties to be updated. Currently only `text` (for supported block types) and `checked` (for `to_do` blocks) fields can be updated.",
-                    "properties": {}
+                    "description": "Update paragraph block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "color": { "type": "string" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "heading_1": {
+                    "type": "object",
+                    "description": "Update heading_1 block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "color": { "type": "string" },
+                      "is_toggleable": { "type": "boolean" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "heading_2": {
+                    "type": "object",
+                    "description": "Update heading_2 block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "color": { "type": "string" },
+                      "is_toggleable": { "type": "boolean" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "heading_3": {
+                    "type": "object",
+                    "description": "Update heading_3 block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "color": { "type": "string" },
+                      "is_toggleable": { "type": "boolean" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "bulleted_list_item": {
+                    "type": "object",
+                    "description": "Update bulleted_list_item block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "color": { "type": "string" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "numbered_list_item": {
+                    "type": "object",
+                    "description": "Update numbered_list_item block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "color": { "type": "string" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "to_do": {
+                    "type": "object",
+                    "description": "Update to_do block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "checked": { "type": "boolean" },
+                      "color": { "type": "string" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "toggle": {
+                    "type": "object",
+                    "description": "Update toggle block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "color": { "type": "string" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "quote": {
+                    "type": "object",
+                    "description": "Update quote block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "color": { "type": "string" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "callout": {
+                    "type": "object",
+                    "description": "Update callout block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "icon": {
+                        "type": "object",
+                        "properties": {
+                          "type": { "type": "string", "enum": ["emoji", "external"] },
+                          "emoji": { "type": "string" },
+                          "external": {
+                            "type": "object",
+                            "properties": { "url": { "type": "string" } },
+                            "required": ["url"]
+                          }
+                        }
+                      },
+                      "color": { "type": "string" }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "code": {
+                    "type": "object",
+                    "description": "Update code block content.",
+                    "properties": {
+                      "rich_text": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" },
+                        "maxItems": 100
+                      },
+                      "language": { "type": "string" },
+                      "caption": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/richTextRequest" }
+                      }
+                    },
+                    "required": ["rich_text"]
+                  },
+                  "table": {
+                    "type": "object",
+                    "description": "Update table block properties (has_column_header, has_row_header). table_width cannot be changed.",
+                    "properties": {
+                      "has_column_header": { "type": "boolean" },
+                      "has_row_header": { "type": "boolean" }
+                    }
+                  },
+                  "table_row": {
+                    "type": "object",
+                    "description": "Update table_row cells.",
+                    "properties": {
+                      "cells": {
+                        "type": "array",
+                        "items": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/richTextRequest" }
+                        }
+                      }
+                    },
+                    "required": ["cells"]
                   },
                   "archived": {
                     "type": "boolean",
@@ -1243,7 +1919,7 @@
                     "type": "array",
                     "description": "The content to be rendered on the new page, represented as an array of [block objects](https://developers.notion.com/reference/block).",
                     "items": {
-                      "type": "string"
+                      "$ref": "#/components/schemas/blockObjectRequest"
                     }
                   },
                   "icon": {
@@ -1644,7 +2320,7 @@
     "/v1/data_sources/{data_source_id}/query": {
       "post": {
         "summary": "Query a data source",
-        "description": "Query a data source (database) using filters and sorts",
+        "description": "Query a data source (database) using filters and sorts. You can pass either a data_source_id or a database_id — if a database_id is provided, it will be automatically resolved to a data_source_id via the search API.",
         "operationId": "query-data-source",
         "tags": [
           "Data sources"
@@ -1653,7 +2329,7 @@
           {
             "name": "data_source_id",
             "in": "path",
-            "description": "Identifier for a Notion data source (database)",
+            "description": "Identifier for a Notion data source. You can also pass a database_id here — it will be automatically resolved to the correct data_source_id.",
             "schema": {
               "type": "string"
             },

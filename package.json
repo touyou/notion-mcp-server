@@ -1,12 +1,12 @@
 {
-  "name": "@notionhq/notion-mcp-server",
+  "name": "@touyou/notion-mcp-server",
   "keywords": [
     "notion",
     "api",
     "mcp",
     "server"
   ],
-  "version": "2.3.0",
+  "version": "1.0.0",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -49,15 +49,15 @@
     "typescript": "^5.8.2",
     "vitest": "^4.0.18"
   },
-  "description": "Official MCP server for Notion API",
+  "description": "Extended MCP server for Notion API — adds full block types, annotations, and improved update/query support. Forked from @notionhq/notion-mcp-server.",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/makenotion/notion-mcp-server.git"
+    "url": "git+ssh://git@github.com/touyou/notion-mcp-server.git"
   },
-  "author": "@notionhq",
+  "author": "touyou",
   "bugs": {
-    "url": "https://github.com/makenotion/notion-mcp-server/issues"
+    "url": "https://github.com/touyou/notion-mcp-server/issues"
   },
-  "homepage": "https://github.com/makenotion/notion-mcp-server#readme"
+  "homepage": "https://github.com/touyou/notion-mcp-server#readme"
 }
