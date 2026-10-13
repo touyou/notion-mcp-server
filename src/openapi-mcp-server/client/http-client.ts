@@ -32,8 +32,10 @@ export class HttpClientError extends Error {
 export class HttpClient {
   private api: Promise<AxiosInstance>
   private client: OpenAPIClientAxios
+  private openApiSpec: OpenAPIV3.Document | OpenAPIV3_1.Document
 
   constructor(config: HttpClientConfig, openApiSpec: OpenAPIV3.Document | OpenAPIV3_1.Document) {
+    this.openApiSpec = openApiSpec
     // @ts-expect-error
     this.client = new (OpenAPIClientAxios.default ?? OpenAPIClientAxios)({
       definition: openApiSpec,
@@ -49,7 +51,33 @@ export class HttpClient {
     this.api = this.client.init()
   }
 
-  private async prepareFileUpload(operation: OpenAPIV3.OperationObject, params: Record<string, any>): Promise<FormData | null> {
+  /**
+   * Resolve operation parameters, following local `#/components/parameters/...` refs
+   */
+  private resolveParameters(operation: OpenAPIV3.OperationObject): OpenAPIV3.ParameterObject[] {
+    const resolved: OpenAPIV3.ParameterObject[] = []
+    for (const param of operation.parameters ?? []) {
+      if (!('$ref' in param)) {
+        resolved.push(param)
+        continue
+      }
+      const target = param.$ref
+        .replace(/^#\//, '')
+        .split('/')
+        .map((segment) => segment.replace(/~1/g, '/').replace(/~0/g, '~'))
+        .reduce<any>((node, segment) => node?.[segment], this.openApiSpec)
+      if (target && typeof target === 'object' && 'name' in target && 'in' in target) {
+        resolved.push(target as OpenAPIV3.ParameterObject)
+      }
+    }
+    return resolved
+  }
+
+  private async prepareFileUpload(
+    operation: OpenAPIV3.OperationObject,
+    params: Record<string, any>,
+    nonBodyParamNames: Set<string>,
+  ): Promise<FormData | null> {
     const fileParams = isFileUploadParameter(operation)
     if (fileParams.length === 0) return null
 
@@ -90,7 +118,7 @@ export class HttpClient {
 
     // Add non-file parameters to form data
     for (const [key, value] of Object.entries(params)) {
-      if (!fileParams.includes(key)) {
+      if (!fileParams.includes(key) && !nonBodyParamNames.has(key)) {
         formData.append(key, value)
       }
     }
@@ -111,26 +139,26 @@ export class HttpClient {
       throw new Error('Operation ID is required')
     }
 
+    // Path, query and header parameters never belong in the request body.
+    // openapi-client-axios places each one by its `in` (header params become HTTP headers).
+    const nonBodyParams = this.resolveParameters(operation).filter(
+      (param) => param.in === 'path' || param.in === 'query' || param.in === 'header',
+    )
+    const nonBodyParamNames = new Set(nonBodyParams.map((param) => param.name))
+
     // Handle file uploads if present
-    const formData = await this.prepareFileUpload(operation, params)
+    const formData = await this.prepareFileUpload(operation, params, nonBodyParamNames)
 
     // Separate parameters based on their location
     const urlParameters: Record<string, any> = {}
     const bodyParams: Record<string, any> = formData || { ...params }
 
-    // Extract path and query parameters based on operation definition
-    if (operation.parameters) {
-      for (const param of operation.parameters) {
-        if ('name' in param && param.name && param.in) {
-          if (param.in === 'path' || param.in === 'query') {
-            if (params[param.name] !== undefined) {
-              urlParameters[param.name] = params[param.name]
-              if (!formData) {
-                delete bodyParams[param.name]
-              }
-            }
-          }
-        }
+    for (const param of nonBodyParams) {
+      if (params[param.name] !== undefined) {
+        urlParameters[param.name] = params[param.name]
+      }
+      if (!formData) {
+        delete bodyParams[param.name]
       }
     }
 

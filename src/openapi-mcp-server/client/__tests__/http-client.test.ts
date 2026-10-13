@@ -531,4 +531,68 @@ describe('HttpClient', () => {
     // Additional check to ensure headers are correctly processed
     expect(response.headers.get('content-type')).toBe('application/json')
   })
+
+  describe('$ref header parameters', () => {
+    const refSpec: OpenAPIV3.Document = {
+      openapi: '3.0.0',
+      info: { title: 'Test API', version: '1.0.0' },
+      components: {
+        parameters: {
+          notionVersion: {
+            name: 'Notion-Version',
+            in: 'header',
+            required: false,
+            schema: { type: 'string', default: '2025-09-03' },
+          },
+          blockId: {
+            name: 'block_id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+          },
+        },
+      },
+      paths: {
+        '/v1/blocks/{block_id}/children': {
+          patch: {
+            operationId: 'patch-block-children',
+            parameters: [{ $ref: '#/components/parameters/blockId' }, { $ref: '#/components/parameters/notionVersion' }],
+            requestBody: {
+              content: {
+                'application/json': {
+                  schema: { type: 'object', properties: { children: { type: 'array', items: { type: 'object' } } } },
+                },
+              },
+            },
+            responses: { '200': { description: 'OK' } },
+          },
+        },
+      },
+    }
+
+    it('keeps $ref-resolved header and path parameters out of the request body', async () => {
+      const mockAxiosInstance = {
+        'patch-block-children': vi.fn().mockResolvedValue({ data: {}, status: 200, headers: {} }),
+      }
+      mockInit.mockResolvedValue(mockAxiosInstance)
+
+      const client = new HttpClient({ baseUrl: 'https://api.notion.com' }, refSpec)
+      const operation = refSpec.paths['/v1/blocks/{block_id}/children']?.patch as OpenAPIV3.OperationObject & {
+        method: string
+        path: string
+      }
+
+      await client.executeOperation(operation, {
+        block_id: 'abc',
+        'Notion-Version': '2025-09-03',
+        children: [],
+      })
+
+      expect(mockAxiosInstance['patch-block-children']).toHaveBeenCalledWith(
+        { block_id: 'abc', 'Notion-Version': '2025-09-03' },
+        { children: [] },
+        { headers: { 'Content-Type': 'application/json' } },
+      )
+    })
+  })
 })
