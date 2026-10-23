@@ -41,13 +41,13 @@
     "@types/mustache": "^4.2.5",
     "@types/node": "^20.17.16",
     "@types/which": "^3.0.4",
-    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/coverage-v8": "^4.1.12",
     "esbuild": "^0.25.2",
     "multer": "1.4.5-lts.1",
     "openai": "^4.91.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.12"
   },
   "description": "Extended MCP server for Notion API — adds full block types, annotations, and improved update/query support. Forked from @notionhq/notion-mcp-server.",
   "main": "index.js",
