@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Use Node.js LTS as the base image
-FROM node:20-slim AS builder
+FROM node:24-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -22,11 +22,11 @@ RUN --mount=type=cache,target=/root/.npm npm run build
 RUN --mount=type=cache,target=/root/.npm npm link
 
 # Minimal image for runtime
-FROM node:20-slim
+FROM node:24-slim
 
 # Copy built package from builder stage
 COPY scripts/notion-openapi.json /usr/local/scripts/
-COPY --from=builder /usr/local/lib/node_modules/@notionhq/notion-mcp-server /usr/local/lib/node_modules/@notionhq/notion-mcp-server
+COPY --from=builder /usr/local/lib/node_modules/@touyou/notion-mcp-server /usr/local/lib/node_modules/@touyou/notion-mcp-server
 COPY --from=builder /usr/local/bin/notion-mcp-server /usr/local/bin/notion-mcp-server
 
 # Set default environment variables
